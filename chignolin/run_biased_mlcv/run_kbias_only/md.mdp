@@ -1,0 +1,50 @@
+title       = Protein-ligand complex MD simulation
+
+; Run parameters
+integrator = sd
+dt = 0.002     ; 2 fs
+nsteps =  5000000 ; 5E6, 10 ns
+
+; Periodic boundary conditions
+pbc         = xyz       ; 3-D PBC
+; Dispersion correction
+DispCorr    = EnerPres  ; account for cut-off vdW scheme
+; Bond parameters
+continuation    = no
+constraint_algorithm = lincs
+constraints     = h-bonds
+lincs_iter      = 1
+lincs_order     = 4
+; Neighborsearching
+cutoff-scheme   = Verlet
+ns_type         = grid
+nstlist         = 10
+rcoulomb        = 1.0
+rvdw            = 1.0
+; Electrostatics
+coulombtype     = PME
+pme_order       = 4
+fourierspacing  = 0.125
+
+; Temperature coupling
+tc-grps = system
+tau-t = 1.0; ps
+ref-t = 340; K
+pcoupl =  no ;
+
+; Output control
+nstxout             = 0
+nstvout             = 0
+nstfout             = 0
+nstenergy           = 5000
+nstlog              = 5000
+nstxout-compressed  = 250
+
+; Velocity generation
+gen_vel     = yes        ; assign velocities from Maxwell distribution
+gen_seed    = -1
+
+; COM removal
+comm-mode = linear
+nstcomm = 100
+nstcalcenergy = 250

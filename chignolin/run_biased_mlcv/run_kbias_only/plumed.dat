@@ -1,0 +1,23 @@
+# vim: ft=plumed
+LOAD FILE=../../../plumed_pytorch_pairformer/PytorchPairFormerExported.cpp
+
+MOLINFO STRUCTURE=../../data/gmx/plumed_topo.pdb PYTHON_BIN=python
+GROUP ATOMS={@mdt:{protein and backbone and not type H}} LABEL=g1
+
+WHOLEMOLECULES ENTITY0=1-166
+
+DISTANCE ATOMS=5,147 NOPBC LABEL=d_ee
+DISTANCE ATOMS=45,106 NOPBC LABEL=d_asp3n_gly7o
+DISTANCE ATOMS=45,120 NOPBC LABEL=d_asp3n_thr8o
+RMSD REFERENCE=../../data/gmx/rmsd_ref_ca.pdb TYPE=OPTIMAL LABEL=r_ca
+
+PYTORCH_PAIRFORMER_EXPORTED ...
+  GROUPA=g1
+  MODEL=../../train/model.k_bias.large.pt2
+  STRUCTURE=../../data/gmx/plumed_pairformer_topo.pdb
+  LABEL=pf
+... PYTORCH_PAIRFORMER_EXPORTED
+
+BIASVALUE ARG=pf.kbias LABEL=v_k
+
+PRINT ARG=* STRIDE=250 FILE=colvar

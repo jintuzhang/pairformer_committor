@@ -1,0 +1,24 @@
+# vim: ft=plumed
+
+MOLINFO STRUCTURE=../../../../../data/gmx/plumed_topo.pdb PYTHON_BIN=python
+GROUP ATOMS={@mdt:{protein and backbone and not type H}} LABEL=g1
+
+WHOLEMOLECULES ENTITY0=1-166
+
+DISTANCE ATOMS=5,147 NOPBC LABEL=d_ee
+DISTANCE ATOMS=45,106 NOPBC LABEL=d_asp3n_gly7o
+DISTANCE ATOMS=45,120 NOPBC LABEL=d_asp3n_thr8o
+RMSD REFERENCE=../../../../../data/gmx/rmsd_ref_ca.pdb TYPE=OPTIMAL LABEL=r_ca
+
+COMMITTOR ...
+   ARG=d_ee,r_ca
+   BASIN_LL1=0.0,0.0
+   BASIN_UL1=0.5,0.05
+   BASIN_LL2=1.6,0.5
+   BASIN_UL2=100,100
+   STRIDE=100
+   FILE=STOPCAR
+   NOSTOP
+...
+
+PRINT ARG=* STRIDE=500 FILE=colvar
