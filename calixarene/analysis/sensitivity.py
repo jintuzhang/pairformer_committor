@@ -101,24 +101,9 @@ dataset = mpair.utils.io.create_dataset_from_trajectories(
     ],
     n_atoms_padded_environment=180,
     node_embeddings=['atom_names', 'residue_names'],
-    n_workers=64,
+    n_workers=96,
 )
 dataset = dataset[:-2]
-ff_dataset, ff_dataframe = ffio.create_dataset_from_files(
-    file_names=['../run_biased_mlcv/run_opes_only/G2/colvar'],
-    return_dataframe=True
-)
-dataframe = ff_dataframe.fillna(
-    {'w_1.bias': 0, 'w_f.bias': 0, 'opes.bias': 0, 'w_cap.bias': 0}
-)
-bias_w1 = torch.tensor(dataframe['w_1.bias'].values)
-bias_wf = torch.tensor(dataframe['w_f.bias'].values)
-bias_opes = torch.tensor(dataframe['opes.bias'].values)
-bias_c = torch.tensor(dataframe['w_cap.bias'].values)
-bias = bias_w1 + bias_wf + bias_opes + bias_c
-dataset = mpair.cvs.committor.compute_committor_weights(
-    dataset, bias, 1 / (0.008314 * 300)
-)
 dataset = dataset[2000:]
 
 s = mpair.explain.pair_sensitivity(
@@ -126,6 +111,7 @@ s = mpair.explain.pair_sensitivity(
     dataset,
     device='cuda',
     batch_size=3000,
+    component=1,
 )['sensitivities']
 np.savetxt('sensitivity.g2.dat', s)
 
@@ -154,30 +140,17 @@ dataset = mpair.utils.io.create_dataset_from_trajectories(
     ],
     n_atoms_padded_environment=180,
     node_embeddings=['atom_names', 'residue_names'],
-    n_workers=64,
+    n_workers=96,
 )
 dataset = dataset[1:-1]
-ff_dataset, ff_dataframe = ffio.create_dataset_from_files(
-    file_names=['../run_biased_mlcv/run_opes_only/G5/colvar'],
-    return_dataframe=True
-)
-dataframe = ff_dataframe.fillna(
-    {'w_1.bias': 0, 'w_f.bias': 0, 'opes.bias': 0, 'w_cap.bias': 0}
-)
-bias_w1 = torch.tensor(dataframe['w_1.bias'].values)
-bias_wf = torch.tensor(dataframe['w_f.bias'].values)
-bias_opes = torch.tensor(dataframe['opes.bias'].values)
-bias_c = torch.tensor(dataframe['w_cap.bias'].values)
-bias = bias_w1 + bias_wf + bias_opes + bias_c
-dataset = mpair.cvs.committor.compute_committor_weights(
-    dataset, bias, 1 / (0.008314 * 300)
-)
+dataset = dataset[2000:]
 
 s = mpair.explain.pair_sensitivity(
     cv,
     dataset,
     device='cuda',
     batch_size=3000,
+    component=1,
 )['sensitivities']
 np.savetxt('sensitivity.g5.dat', s)
 
@@ -206,29 +179,16 @@ dataset = mpair.utils.io.create_dataset_from_trajectories(
     ],
     n_atoms_padded_environment=180,
     node_embeddings=['atom_names', 'residue_names'],
-    n_workers=64,
+    n_workers=96,
 )
 dataset = dataset[2:]
-ff_dataset, ff_dataframe = ffio.create_dataset_from_files(
-    file_names=['../run_biased_mlcv/run_opes_only/G6/colvar'],
-    return_dataframe=True
-)
-dataframe = ff_dataframe.fillna(
-    {'w_1.bias': 0, 'w_f.bias': 0, 'opes.bias': 0, 'w_cap.bias': 0}
-)
-bias_w1 = torch.tensor(dataframe['w_1.bias'].values)
-bias_wf = torch.tensor(dataframe['w_f.bias'].values)
-bias_opes = torch.tensor(dataframe['opes.bias'].values)
-bias_c = torch.tensor(dataframe['w_cap.bias'].values)
-bias = bias_w1 + bias_wf + bias_opes + bias_c
-dataset = mpair.cvs.committor.compute_committor_weights(
-    dataset, bias, 1 / (0.008314 * 300)
-)
+dataset = dataset[2000:]
 
 s = mpair.explain.pair_sensitivity(
     cv,
     dataset,
     device='cuda',
     batch_size=3000,
+    component=1,
 )['sensitivities']
 np.savetxt('sensitivity.g6.dat', s)
