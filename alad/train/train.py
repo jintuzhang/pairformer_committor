@@ -1,5 +1,5 @@
 import torch
-import mlcolvar.pair as mpair
+import mlcolvar.pairformer as mpair
 from mlcolvar.utils import io as ffio
 
 from lightning import Trainer
