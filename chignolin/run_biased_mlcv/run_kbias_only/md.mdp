@@ -3,7 +3,7 @@ title       = Protein-ligand complex MD simulation
 ; Run parameters
 integrator = sd
 dt = 0.002     ; 2 fs
-nsteps =  5000000 ; 5E6, 10 ns
+nsteps =  10000000 ; 1E7, 20 ns
 
 ; Periodic boundary conditions
 pbc         = xyz       ; 3-D PBC
