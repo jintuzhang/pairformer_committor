@@ -733,6 +733,7 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
   log << "  Bibliography: ";
   log << plumed.cite("Bonati, Trizio, Rizzi and Parrinello, J. Chem. Phys. 159, 014801 (2023)");
   log << plumed.cite("Bonati, Rizzi and Parrinello, J. Phys. Chem. Lett. 11, 2998-3004 (2020)");
+  log << plumed.cite("Zhang et al., arXiv preprint arXiv:2606.31832 (2026)");
   log.printf("\n");
 }
 

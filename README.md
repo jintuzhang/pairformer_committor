@@ -1,7 +1,7 @@
 # PairFormer Committor
 
 This repository contains all the input files and data related to the paper
-"[Navigating committor landscape of biomolecules with a general pairwise interaction model.]()".
+"[Navigating committor landscape of biomolecules with a general pairwise interaction model.](https://arxiv.org/abs/2606.31832)".
 
 The following directories contains the training script, simulation setup and
 models for the different systems presented in the manuscript:
