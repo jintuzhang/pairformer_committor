@@ -4,8 +4,14 @@ import numpy as np
 for i in [2, 5, 6]:
     results = []
     for j in [1, 2, 3]:
-        d = plumed.read_as_pandas(f'G{i}_gmx_t2_{j}/colvar')[0:]
-        ratio = (d['V2'] < 0.3).sum() / (d['V2'] > 0.5).sum()
+        d = plumed.read_as_pandas(f'G{i}/{j}/colvar')[100:]
+        w = np.exp(d['pf.kbias'] / 2.5)
+        w = w / sum(w)
+        w_new = np.exp(-d['pf.kbias'] / 2.5 / 1.2)
+        ratio = (
+            ((d['V2'] < 0.3) * w * w_new).sum()
+            / ((d['V2'] > 0.5) * w * w_new).sum()
+        )
         results.append(ratio)
     print(
         'G{:d} (dry path): {:.3f} +- {:.3f}'.format(
