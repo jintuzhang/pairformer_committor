@@ -9,8 +9,8 @@ for i in [2, 5, 6]:
         w = w / sum(w)
         w_new = np.exp(-d['pf.kbias'] / 2.5 / 1.2)
         ratio = (
-            ((d['V2'] < 0.3) * w * w_new).sum()
-            / ((d['V2'] > 0.5) * w * w_new).sum()
+            ((d['V2'] < 0.5) * w * w_new).sum()
+            / ((d['V2'] > 1) * w * w_new).sum()
         )
         results.append(ratio)
     print(
