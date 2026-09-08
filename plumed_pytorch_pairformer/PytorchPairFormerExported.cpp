@@ -196,7 +196,7 @@ class PytorchPairFormerExported: public Colvar
   torch::Tensor centers;
   torch::Tensor system_masks;
   torch::Tensor pair_masks;
-  torch::Tensor residue_adjustency;
+  torch::Tensor residue_adjacency;
   const std::array<std::string, 3> implemented_embeddings = {
     "atom_names", "residue_names", "",
   };
@@ -477,7 +477,7 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
     int count = 0;
     unsigned resseq = pdb.getResidueNumber(atom_list_a[0]);
     std::string chain_id = pdb.getChainID(atom_list_a[0]);
-    residue_adjustency = torch::zeros(
+    residue_adjacency = torch::zeros(
       {n_residues_padded, n_atoms_padded}, torch::dtype(torch::kInt64)
     );
     for (size_t i = 0; i < atom_list_a.size(); i++) {
@@ -490,7 +490,7 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
         if (count >= n_residues_padded)
           plumed_merror("Number of residues " + std::to_string(count) + " is larger than the padding size " + std::to_string(n_residues_padded));
       }
-      residue_adjustency[count][i] = 1;
+      residue_adjacency[count][i] = 1;
     }
     pair_masks.index({
       torch::indexing::Slice(0, count + 1),
@@ -501,14 +501,14 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
       torch::indexing::Slice(0, 1),
     }) = true;
   } else {
-    residue_adjustency = torch::tensor(0, torch::dtype(torch::kInt64));
+    residue_adjacency = torch::tensor(0, torch::dtype(torch::kInt64));
     pair_masks.index({
       torch::indexing::Slice(0, atom_list_a.size()),
       torch::indexing::Slice(0, atom_list_a.size()),
     }) = 1;
   }
 
-  residue_adjustency = residue_adjustency.to(device);
+  residue_adjacency = residue_adjacency.to(device);
   system_masks = system_masks.to(device);
   pair_masks = pair_masks.to(device);
 
@@ -735,9 +735,9 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
     log.printf("  Residue mapping:\n");
     for (int i = 0; i < n_residues_padded; i++) {
       log.printf("    %d: ", i);
-      if (residue_adjustency[i].sum().item<int64_t>() > 0) {
+      if (residue_adjacency[i].sum().item<int64_t>() > 0) {
         for (int j = 0; j < n_atoms_padded; j++) {
-          if (residue_adjustency[i][j].item<int64_t>() != 0)
+          if (residue_adjacency[i][j].item<int64_t>() != 0)
             log.printf("%d ", atom_list_a[j].serial());
         }
       } else {
@@ -1108,7 +1108,7 @@ void PytorchPairFormerExported::calculate()
     n_environment_padded,
     environment_masks,
     centers,
-    residue_adjustency,
+    residue_adjacency,
     system_masks,
   };
 
