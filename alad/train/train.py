@@ -46,7 +46,7 @@ try:
     bias_k = torch.tensor(dataframe['pf.kbias'].values)
 except KeyError:
     bias_k = torch.zeros(len(dataframe))
-bias = bias_opes + bias_opes
+bias = bias_opes + bias_k
 
 dataset = mpair.cvs.committor.compute_committor_weights(dataset, bias, 1/2.49)
 masses = mpair.data.atomic.get_masses(dataset.mapping_names['atom_names'])
