@@ -429,6 +429,14 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
   else
     n_residues_padded = 0;
 
+  if ((int)atom_list_a.size() > n_atoms_padded)
+    plumed_merror(
+      "GROUPA contains " + std::to_string(atom_list_a.size()) +
+      " atoms, which is larger than the exported model padding size " +
+      std::to_string(n_atoms_padded) + ". Re-export the model with a larger "
+      "`n_atoms_padded` value or reduce GROUPA."
+    );
+
   // embedding tables
   int n_atom_names = 0;
   int n_residue_names = 0;
@@ -543,24 +551,33 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
         "Exported model \"" + model_file_name + "\" does not contain gradients!"
       );
 
-  // create system atomic numbers
+  // create atomic number masks for atoms whose embeddings may be used by the
+  // exported model. GROUPB is included because exported committor/kbias and
+  // future environment-aware models may read environment node attributes.
   std::vector<int> atom_is_required(pdb.getAtomNumbers().size());
+  std::vector<int> atom_is_environment(pdb.getAtomNumbers().size());
   for (size_t i = 0; i < atom_list_a.size(); i++) {
     int index = atom_list_a[i].index();
     atom_is_required[index] = 1;
+  }
+  for (size_t i = 0; i < atom_list_b.size(); i++) {
+    int index = atom_list_b[i].index();
+    atom_is_environment[index] = 1;
   }
 
   if (n_atom_names > 0) {
     for (size_t i = 0; i < pdb.getAtomNumbers().size(); i++) {
       AtomNumber index = pdb.getAtomNumbers()[i];
+      int atom_index = index.index();
       std::string name = pdb.getAtomName(index);
       auto iter = std::find(
         model_atom_names.begin(), model_atom_names.end(), name
       );
       if (iter == model_atom_names.end()) {
-        if (atom_is_required[i])
+        if (atom_is_required[atom_index] || atom_is_environment[atom_index])
           plumed_merror(
-            "Atom '" + name + "' does not present in model " + model_file_name
+            "Atom '" + name + "' selected by GROUPA/GROUPB does not present "
+            "in model " + model_file_name
           );
         else
           system_node_types.push_back(-1);
@@ -575,14 +592,16 @@ PytorchPairFormerExported::PytorchPairFormerExported(const ActionOptions& ao):
   if (n_residue_names > 0) {
     for (size_t i = 0; i < pdb.getAtomNumbers().size(); i++) {
       AtomNumber index = pdb.getAtomNumbers()[i];
+      int atom_index = index.index();
       std::string name = trim(pdb.getResidueName(index));
       auto iter = std::find(
         model_residue_names.begin(), model_residue_names.end(), name
       );
       if (iter == model_residue_names.end()) {
-        if (atom_is_required[i])
+        if (atom_is_required[atom_index] || atom_is_environment[atom_index])
           plumed_merror(
-            "Residue '" + name + "' does not present in model " + model_file_name
+            "Residue '" + name + "' selected by GROUPA/GROUPB does not "
+            "present in model " + model_file_name
           );
         else
           system_residue_types.push_back(-1);
@@ -974,7 +993,7 @@ void PytorchPairFormerExported::calculate()
       torch::TensorOptions().dtype(torch::kFloat32)
     );
     cell = cell.to(device).to(torch_float_dtype);
-    cell = cell.reshape({3, 3});
+    cell = cell.reshape({3, 3}).clone();
   } else {
     cell = torch::zeros({1, 1}, torch::dtype(torch::kFloat32));
     cell = cell.to(device).to(torch_float_dtype);
