@@ -13,6 +13,7 @@ PYTORCH_PAIRFORMER_EXPORTED ...
   MODEL=../../train/model.k_bias.pt2
   STRUCTURE=../../data/plumed_topo.pdb
   LABEL=pf
+  NOPBC
 ... PYTORCH_PAIRFORMER_EXPORTED
 
 potential: BIASVALUE ARG=pf.kbias

@@ -16,6 +16,7 @@ PYTORCH_PAIRFORMER_EXPORTED ...
   MODEL=../../train/model.k_bias.large.pt2
   STRUCTURE=../../data/gmx/plumed_pairformer_topo.pdb
   LABEL=pf
+  NOPBC
 ... PYTORCH_PAIRFORMER_EXPORTED
 
 BIASVALUE ARG=pf.kbias LABEL=v_k
